@@ -77,7 +77,6 @@ class AutoVol3(object):
     
     csv_files = ['pslist.csv', 'psscan.csv', 'pstree.csv', 'dlllist.csv', 'cmdline.csv', 'netstat.csv', 'netscan.csv', 'handles.csv', 'getsids.csv']
 
-
     def __init__(self, image):
 
         self.image = image
@@ -89,7 +88,6 @@ class AutoVol3(object):
         self.initialize_normal_paths(os.path.join(self.app_path, 'normal_paths.txt'))
         self.initialize_normal_sids(os.path.join(self.app_path, 'normal_sids.txt'))
         self.initialize_whitelist_paths('whitelist.txt')
-
 
         # Read the required file from running the volatility plugins.
         self.csv_reader('pslist.csv')
@@ -106,8 +104,11 @@ class AutoVol3(object):
         self.malcomm('blacklist.txt')
         self.baseline('proc_baseline.txt')
         self.malgetsids()
+        self.find_processes_without_parents() 
+
+        # The following function must be run the last one
         self.malicious_weight()
-        self.find_processes_without_parents()
+        
         
         header = ['Source Name', 'PID', 'PPID','Process Name', 'Path', 'Timestamps', 'Long Description']
         self.evidence_bag.append(','.join(header))
@@ -134,10 +135,7 @@ class AutoVol3(object):
         except Exception as e:
             print("An error occurred:", str(e))
 
-
     def csvgen(self, memory_image_path):
-        
-        
 
         # Specify the directory path you want to list files from
         #directory_path = "./memory"
@@ -174,15 +172,12 @@ class AutoVol3(object):
             print(f"An error occurred: {str(e)}")
 
 
-
     def baseline(self, baseline_file):
         try:
             # Use the os.listdir() function to get a list of files in the directory
             fpath = os.path.join(self.app_path, args.p)
             files = os.listdir(fpath)
-            
-            
-            
+
             # If proc_baseline.txt is not found, uncomment the next two lines to create it. It will takkke sometime. Be patient
             if baseline_file not in files:
                 # Define the command as a list of strings
@@ -223,7 +218,6 @@ class AutoVol3(object):
 
         # print("Replacement complete. Output written to", 'suspecious_proc.txt')
 
-
     def initialize_normal_proc(self, normal_proc_file):
 
         # Open and read the "normal_proc.txt" file
@@ -240,7 +234,6 @@ class AutoVol3(object):
                 self.normal_proc[parent].append(child)
 
         # The resulting dictionary is parsed_normal_proc
-        # print(self.normal_proc)
 
     def initialize_whitelist_paths(self, whitelist_file):
 
@@ -266,7 +259,6 @@ class AutoVol3(object):
                 
                 # Append the child to the parent's list of children
                 self.normal_sids[parent].append(child)
-        #print(self.normal_sids)
 
 
     def initialize_normal_paths(self, fpath):
@@ -343,7 +335,7 @@ class AutoVol3(object):
         if parent_node:
             
             if parent_node.pid not in self.score:
-                print(f"Parent PID: {parent_node.pid}, Image File Name: {parent_node.image_file_name}")
+                #print(f"Parent PID: {parent_node.pid}, Image File Name: {parent_node.image_file_name}")
 
                 # Because score keeps track of pid while evidence_bag not. In addition, let the score of the parent is equal to child
                 self.score[parent_node.pid] = self.score[child_pid] 
@@ -351,8 +343,8 @@ class AutoVol3(object):
             # If the parent is not services.exe, recursively find its parent
             if parent_node.image_file_name != 'svchost.exe':
                 self.find_parent_recursive(parent_node.pid)
-        else:
-            print(f"No parent found for PID {child_pid}.")
+        # else:
+        #     print(f"No parent found for PID {child_pid}.")
 
     def malproc(self,node):
 
@@ -370,20 +362,17 @@ class AutoVol3(object):
         return #suspect_proc
 
     def find_processes_without_parents(self):
-       # root_processes = []
         for pid, node in self.process_tree.items():
 
             if node.ppid not in self.process_tree:
                 #root_processes.append(pid)
                 if pid == '0':
                     continue
-                #print(self.pslist[node.children[0].pid])
+                # print(self.pslist[node.children[0].pid])
                 self.suspect_proc[node.children[0].pid] =self.pslist[node.children[0].pid][2:]+ ', Has a zero root parent'
-        print(self.suspect_proc['2222'])
-        #return root_processes
-    
-    def malcmdline(self):
 
+        #return root_processes
+    def malcmdline(self):
 
         no_path = ['wininit.exe', 'winlogon.exe', 'dwm.exe', 'fontdrvhost.exe', 'sihost.exe', 'ctfmon.exe', 'mctray.exe', 'taskhostw.exe', 'LogonUI.exe']
 
@@ -391,9 +380,8 @@ class AutoVol3(object):
 
             process_path = ''
 
+            # Skip lines with 'process exited'
             if "process exited" in self.cmdline[pid] or 'c:\\' not in self.cmdline[pid].lower():
-                # Skip lines with 'process exited'
-                #print(self.cmdline[pid])
                 continue
             
             row = self.cmdline[pid].strip().strip('\n')
@@ -430,7 +418,6 @@ class AutoVol3(object):
                         if process in path:
                             process_path = path
 
-
                  # Extract the path using regex, considering double quotes
                 pattern = r'"?([C|c]:\\[a-zA-Z0-9%\\ \(\)\._]*\.[eE][xX][eE]|[%\\]SystemRoot[%\\][a-zA-Z0-9%\\]*\.exe)\b'            
                 paths = re.findall(pattern, columns[3])
@@ -441,8 +428,6 @@ class AutoVol3(object):
                     
                     # Check if the path is exactly in the process_paths
                     if path != process_path:
-                        # print(process, ': ',process_path)
-                        # print('RegeEx Path: ',path)
                         self.suspect_cmdlines[pid] = row
                 else:
                     # If no path found, consider it suspect
@@ -450,26 +435,17 @@ class AutoVol3(object):
             else:
                 # If process not in the list, consider it suspect
                 self.suspect_cmdlines[pid] = row
-        # return suspect_cmdlines
-    
+        # return suspect_cmdlines  
 
     def malcomm(self, blacklist_file_path):
         #print('Sixth modification')
         blacklist_addresses = self.initialize_blacklist_addresses(blacklist_file_path)
         # Open the CSV file and parse the data
 
-
-        #filtered_processes = []
-
-            # Define the browser processes you want to exclude
+        # Define the browser processes you want to exclude
         browsers = ["chrome.exe", "firefox.exe", "iexplore.exe", "edge.exe"]  # Add more if needed
 
-        #filtered_processes.append(','.join(header))
-        
-        #print(self.netscan)
         for pid in self.netscan:
-            #print(self.netscan)
-            #row = self.netscan[pid].split(',')
 
             suspect_comm = []
             if len(self.netscan[pid]) > 1:
@@ -492,9 +468,7 @@ class AutoVol3(object):
                         foreign_addr = tmp_addr[0]
                         foreign_port = tmp_addr[1]
 
-
                         owner = row[6].lower()  # Convert owner to lowercase for case-insensitive comparison
-
                             
                         if foreign_port in ["80", "443", "8080"] and not any(browser in owner for browser in browsers):
                            suspect_comm.append(','.join(row))
@@ -526,10 +500,8 @@ class AutoVol3(object):
                     foreign_addr = tmp_addr[0]
                     foreign_port = tmp_addr[1]
 
-
                     owner = row[6].lower()  # Convert owner to lowercase for case-insensitive comparison
-
-                        
+                       
                     if foreign_port in ["80", "443", "8080"] and not any(browser in owner for browser in browsers):
                        suspect_comm.append(','.join(row))
                     elif any(browser in owner for browser in browsers) and foreign_port not in ["80", "443", "8080"]:
@@ -552,7 +524,6 @@ class AutoVol3(object):
 
 
     def malgetsids(self):
-        # print("Malicious getsids found here")    
 
         # suspecious_proc_sids = []
         for pid in self.getsids:
@@ -575,14 +546,11 @@ class AutoVol3(object):
                     row.append('Malicious Process: Uknown process running with system account')
                     self.suspecious_proc_sids[pid] =','.join(row)
 
-        # return suspecious_proc_sids
 
     def csv_reader(self, csv_file):    
     # Create an empty dictionary to store data with "PID" as the index
-        data_by_pid = {}
 
         # Read and process the CSV file
-
         filePath = os.path.join(self.app_path, args.p) + '/'+csv_file
         
         if csv_file == 'netscan.csv':
@@ -605,17 +573,15 @@ class AutoVol3(object):
                         
                         if len(row) < 10:
                             row.insert(4, '')
-                            #print(row)
+
                         row[7] = ' '.join(row[7:])
                         row = row[0:8]
-                        #print(row)
 
                         if len(row) > pid_index:
                             pid = row[pid_index]
                             if pid not in self.netscan:
                                 self.netscan[pid] = []
-                        self.netscan[pid].append(','.join(row))
-                #print(self.netscan)    
+                        self.netscan[pid].append(','.join(row))   
 
             except FileNotFoundError:            
                 print(f"File '{csv_file}' not found.")
@@ -629,11 +595,9 @@ class AutoVol3(object):
                     # Find the index of the "PID" column
                     pid_index = header.index('PID')
 
-
                     path_index = 0
                     if csv_file == 'dlllist.csv':
                         path_index = header.index('Path')
-
 
                     if csv_file == 'pslist.csv':
                     # Store the row as a comma-separated string in the dictionary
@@ -778,9 +742,6 @@ class AutoVol3(object):
             if pid in self.process_path:
                 path = self.process_path[pid]
 
-            # if path in self.whitelist_paths:
-            #     return
-
             row.append(path)
             row.append(columns[9])        
 
@@ -807,7 +768,6 @@ class AutoVol3(object):
                     if '.exe' in columns[6]:
                         continue
 
-                    
                     # We can add option to use this filtering or not. If we want to find malicious dlls we can use filtering, but
                     # if we want o understand the malcious process capabilities, we ignore filtering becuase used libraries can tell
                     # you the malware can do
@@ -849,9 +809,7 @@ class AutoVol3(object):
             # self.evidence_bag[pid].append(evidence)
 
             row =[]
-            row.append('cmdline')
-            
-        
+            row.append('cmdline')       
             columns = self.cmdline[pid].split(',')
             row.append(columns[1])
             row.append(ppid)
@@ -895,7 +853,7 @@ class AutoVol3(object):
                 row.append('netscan')
                 # evidence = {'dlllist': self.dlllist[pid]}
                 # self.evidence_bag[pid].append(evidence)
-                # print(self.netscan[pid])
+
                 columns = self.netscan[pid][0].split(',')
                 row.append(columns[5])
                 row.append(ppid)
@@ -919,8 +877,6 @@ class AutoVol3(object):
             
                     row =[]
                     row.append('getsids')
-                    
-                
                     columns = item.split(',')
 
                     if columns[4] == '-':
@@ -930,9 +886,6 @@ class AutoVol3(object):
                     row.append(columns[2])
                     row.append(columns[3])
                     row.append('')
-
-                    # if 'Local System' == columns[4]:
-                    #    row.append(columns[3]) 
 
                     # Don't forget to add the enrichment from malgetsids function.
 
@@ -948,16 +901,15 @@ class AutoVol3(object):
                     row.append(reason)
                     self.evidence_bag.append(','.join(row))
 
-
     def create_SuperMemoryParser(self):
 
         header = ['Source Name', 'PID', 'Process Name', 'Path', 'Timestamps', 'Long Description']
-
 
         with open('SuperMemoryParser.csv', 'w') as mparser:
             mparser.write('\n'.join(self.evidence_bag))
 
     def malicious_weight(self):
+        print(self.suspect_proc['2222'])
         if self.pslist:
             for pid in self.pslist:
                 weight = 0
@@ -965,12 +917,16 @@ class AutoVol3(object):
                     # if pid =='9036':
                     #     print(f"Found {pid} in suspect_proc: {self.suspect_proc[pid]}")
                     weight += 10
-                
+
+                    if 'Has a zero root parent' in self.suspect_proc[pid]:
+                        weight += 30
+                        
                 
                 if pid in self.suspecious_proc_sids:
                     # if pid =='9036':
                     #     print(f"Found {pid} in suspecious_proc_sids: {self.suspecious_proc_sids[pid]}")
                     weight += 10
+                    
 
                 if pid in self.suspect_cmdlines:
                     # if '9036' in self.suspect_cmdlines[pid]:
@@ -990,9 +946,7 @@ class AutoVol3(object):
 
                 if weight > 30:
                     self.score[pid] = weight
-
-
-
+                
 
 # Function to add a child node to a parent node
 def add_child(parent, child):
@@ -1037,10 +991,6 @@ def get_application_path():
         if args.debug:
             sys.exit(1)
 
-
-
-
-
 def main(memory):
     
     """
@@ -1067,16 +1017,12 @@ def main(memory):
 
     #     child_pid = parent_node.pid
 
-    # sys.exit(0)
-
-
 
     pid_list = [key for key in memory.score]
 
-
     for pid in pid_list:
         memory.collect_evidence(pid)
-        print(pid, ': ', memory.score[pid])
+        #print(pid, ': ', memory.score[pid])
         # parent = memory.pslist[pid].split(',')[2]
 
         memory.find_parent_recursive(pid)
@@ -1085,7 +1031,6 @@ def main(memory):
         #     memory.collect_evidence(parent)
     
     memory.create_SuperMemoryParser()
-    sys.exit(0)
 
     while True:
 
@@ -1134,7 +1079,6 @@ def main(memory):
             if selected_command == 'getsids':
                 for pid in memory.getsids:
                     print(memory.getsids[pid])
-
 
             print("1. Display only suspecious processes")
             print("2. Continue with full list")
@@ -1253,13 +1197,13 @@ if __name__ == "__main__":
     # Add option for baseline
     # Add option for image profile if using vol2
     # Add option for blacklist IPs
+    # Add option for chosing memory image file
 
     args = parser.parse_args()
 
     if not args.p:
         print('Must specify memory image path!')
         sys.exit(1)
-
 
     autovol3 = AutoVol3(args)
 
@@ -1269,6 +1213,8 @@ if __name__ == "__main__":
     #suspect_proc = autovol3.malcomm('blacklist.txt')
     #autovol3.malgetsids()
     main(autovol3)
+
+    # print('This is the last push')
     
 
     
