@@ -1,12 +1,12 @@
 Source Name,PID,PPID,Process Name,Path,Timestamps,Long Description
-pslist,5848,8712,powershell.exe,c:\windows\syswow64\windowspowershell\v1.0\powershell.exe,2018-08-30 16:43:42.000000 , Suspecious parent-child relationship
+pslist,5848,8712,powershell.exe,c:\windows\syswow64\windowspowershell\v1.0\powershell.exe,2018-08-30 16:43:42.000000 ,Disabled
 cmdline,5848,8712,powershell.exe,c:\windows\syswow64\windowspowershell\v1.0\powershell.exe,,c:\windows\syswow64\windowspowershell\v1.0\powershell.exe -Version 5.1 -s -NoLogo -NoProfile
 netscan,5848,8712,powershell.exe,TCPv4 172.16.6.11:52703 --> 172.16.4.10:8080 CLOSE_WAIT,2018-08-30 16:43:52 UTC+0000,I Will add info later
 getsids,5848,8712,powershell.exe,S-1-5-21-3445421715-2530590580-3149308974-1193,,spsql
 getsids,5848,8712,powershell.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
 getsids,5848,8712,powershell.exe,S-1-5-2,,Network
 getsids,5848,8712,powershell.exe,S-1-5-21-3445421715-2530590580-3149308974-512,,Domain Admins
-pslist,8712,2876,powershell.exe,C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe,2018-08-30 16:43:36.000000 , Suspecious parent-child relationship
+pslist,8712,2876,powershell.exe,C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe,2018-08-30 16:43:36.000000 ,Disabled
 dlllist,8712,2876,powershell.exe,C:\WINDOWS\assembly\NativeImages_v4.0.30319_64\mscorlib\be2b233163fe3b9af2d68b10d4798ef2\mscorlib.ni.dll,2018-08-30 16:43:36.000000 ,Whitelist the clean DLLs
 dlllist,8712,2876,powershell.exe,C:\WINDOWS\assembly\NativeImages_v4.0.30319_64\System\3f2be2130df73a2160b81caeb4307980\System.ni.dll,2018-08-30 16:43:36.000000 ,Whitelist the clean DLLs
 dlllist,8712,2876,powershell.exe,C:\WINDOWS\assembly\NativeImages_v4.0.30319_64\System.Core\9f6502d88f87e8ed4e581d77d8e19d9a\System.Core.ni.dll,2018-08-30 16:43:36.000000 ,Whitelist the clean DLLs
@@ -37,7 +37,7 @@ getsids,8712,2876,powershell.exe,S-1-5-21-3445421715-2530590580-3149308974-1193,
 getsids,8712,2876,powershell.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
 getsids,8712,2876,powershell.exe,S-1-5-2,,Network
 getsids,8712,2876,powershell.exe,S-1-5-21-3445421715-2530590580-3149308974-512,,Domain Admins
-pslist,2876,868,WmiPrvSE.exe,C:\WINDOWS\system32\wbem\wmiprvse.exe,2018-08-30 13:52:26.000000 , Suspecious parent-child relationship
+pslist,2876,868,WmiPrvSE.exe,C:\WINDOWS\system32\wbem\wmiprvse.exe,2018-08-30 13:52:26.000000 ,Disabled
 cmdline,2876,868,WmiPrvSE.exe,C:\WINDOWS\system32\wbem\wmiprvse.exe,,C:\WINDOWS\system32\wbem\wmiprvse.exe
 getsids,2876,868,WmiPrvSE.exe,S-1-5-20,,Malicious Process: Uknown process running with system account: NT Authority
 getsids,2876,868,WmiPrvSE.exe,S-1-16-16384,,Malicious Process: Uknown process running with system account: System Mandatory Level
@@ -50,13 +50,13 @@ getsids,868,740,svchost.exe,S-1-5-18,,Local System
 getsids,868,740,svchost.exe,S-1-16-16384,,System Mandatory Level
 getsids,868,740,svchost.exe,S-1-5-6,,Service
 getsids,868,740,svchost.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
-pslist,5948,5848,cmd.exe,C:\WINDOWS\SysWOW64\cmd.exe,2018-08-30 22:15:18.000000 , Suspecious parent-child relationship
+pslist,5948,5848,cmd.exe,C:\WINDOWS\SysWOW64\cmd.exe,2018-08-30 22:15:18.000000 ,Disabled
 cmdline,5948,5848,cmd.exe,C:\WINDOWS\SysWOW64\cmd.exe,,C:\WINDOWS\system32\cmd.exe /C c:\windows\temp\perfmon\p.exe
 getsids,5948,5848,cmd.exe,S-1-5-21-3445421715-2530590580-3149308974-1193,,spsql
 getsids,5948,5848,cmd.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
 getsids,5948,5848,cmd.exe,S-1-5-2,,Network
 getsids,5948,5848,cmd.exe,S-1-5-21-3445421715-2530590580-3149308974-512,,Domain Admins
-pslist,8260,5948,p.exe,c:\windows\temp\perfmon\p.exe,2018-08-30 22:15:18.000000 , Suspecious parent-child relationship
+pslist,8260,5948,p.exe,c:\windows\temp\perfmon\p.exe,2018-08-30 22:15:18.000000 ,Disabled
 cmdline,8260,5948,p.exe,c:\windows\temp\perfmon\p.exe,,c:\windows\temp\perfmon\p.exe
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63826 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:34:48 UTC+0000,I Will add info later
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63834 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:36:10 UTC+0000,I Will add info later

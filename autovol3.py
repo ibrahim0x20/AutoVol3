@@ -105,6 +105,7 @@ class AutoVol3(object):
         # Analyzing memory for suspicious processes
         self.procTree(os.path.join(self.app_path, args.p) + '/'+'pslist.csv')
         self.malproc(self.process_tree['4'])
+        self.malpath()
         self.malcmdline()
         self.malcomm('blacklist.txt')
         self.baseline('proc_baseline.txt')
@@ -272,7 +273,7 @@ class AutoVol3(object):
             with open(fpath, newline='') as file:
                 
                 for line in file:
-                    self.normal_process_path.append(line.strip('\n').split('\\')[-1])
+                   # self.normal_process_path.append(line.strip('\n').split('\\')[-1])
 
                     if 'program files (x86)' in line:
                         self.normal_paths_x86.append(line.strip('\n'))
@@ -367,10 +368,19 @@ class AutoVol3(object):
 
     def malproc(self,node):
 
+        # 1. Should find abnormal parent-child relationship
+        # 2. Should find zero parent processes
+        # 3. Should find processes running from weired paths
+        # 4. Should hidden/Unlinked processes like processes found in psscan, but not in pslist
+        # 5. When does the process start?
+        # 6. Should find any process that impersonate known processes and trying to blind in with normal processes
+
+
+        # 1. Should find abnormal parent-child relationship
+
         if not node:
             return #suspect_proc
 
-        #child['ImageFileName'] in normal_proc[process]):
         for child in node.children:
             if not(node.image_file_name in self.normal_proc and child.image_file_name in self.normal_proc[node.image_file_name]):
                 # print(node.image_file_name, child.image_file_name)            
@@ -379,6 +389,8 @@ class AutoVol3(object):
             self.malproc(child)
 
         return #suspect_proc
+
+    # 2. Should find zero parent processes
 
     def find_processes_without_parents(self):
         for pid, node in self.process_tree.items():
@@ -389,6 +401,15 @@ class AutoVol3(object):
                     continue
                 # print(self.pslist[node.children[0].pid])
                 self.suspect_proc[node.children[0].pid] =self.pslist[node.children[0].pid][2:]+ ', Has a zero root parent'
+
+    def malpath(self):
+        for pid in self.pslist:
+            # print(self.process_path)
+            if pid in self.process_path:
+                path = self.process_path[pid].lower()
+
+                if not ((path in self.normal_paths) or (path in self.normal_paths_x86)):
+                        self.suspect_proc[pid] = self.pslist[pid]
 
     def find_cmd_child(self, path):
 
@@ -406,6 +427,7 @@ class AutoVol3(object):
 
         return None  # Return None if no match is found for the given path
 
+        
     def malcmdline(self):
         for pid in self.cmdline:
             # print(pid)
@@ -437,7 +459,6 @@ class AutoVol3(object):
                         else:
                             print(f"No match found for {path_executed}")
                     
-        #print(self.suspect_cmdlines)  
 
     def malcomm(self, blacklist_file_path):
         #print('Sixth modification')
@@ -715,6 +736,7 @@ class AutoVol3(object):
             if pid in self.process_path:
                 path = self.process_path[pid]
 
+
             # You need to change this list because it is not clean, missing a lot of system files and dlls.
             # if path in self.whitelist_paths and self.score[pid] < 40:
             #     return
@@ -750,6 +772,7 @@ class AutoVol3(object):
             row.append(path)
             row.append(columns[9])        
 
+            # 4. Should hidden/Unlinked processes like processes found in psscan, but not in pslist
             # Hidden processes: Also add more details such as number of threads, parent process, ....
             if row[1] not in self.pslist:               
                 row.append('Hidden/Unlinked: The process found in psscan, but not in pslist')
