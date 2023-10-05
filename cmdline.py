@@ -92,3 +92,93 @@ def suspecious():
     # Print the suspect command-lines
     for cmdline in suspect_cmdlines:
         print(cmdline)
+
+
+def malcmdline(self):
+
+        no_path = ['wininit.exe', 'winlogon.exe', 'dwm.exe', 'fontdrvhost.exe', 'sihost.exe', 'ctfmon.exe', 'mctray.exe', 'taskhostw.exe', 'LogonUI.exe']
+
+        for pid in self.cmdline:
+
+            process_path = ''
+
+            # Skip lines with 'process exited'
+            if "process exited" in self.cmdline[pid] or 'c:\\' not in self.cmdline[pid].lower():
+                continue
+            
+            row = self.cmdline[pid].strip().strip('\n')
+
+            if row =='':
+                break
+
+            columns = row.split(',')
+            process = columns[2]
+            # Check if the process is in the list of processes
+            #0,5064,ApplicationFra,"C:\WINDOWS\system32\ApplicationFrameHost.exe -Embedding"
+
+            if '.exe' not in process:
+                process = columns[3].split('\\')[-1].split(' ')[0].strip('"')
+
+            if process in no_path:
+                continue
+            
+            if process.lower() in self.normal_process_path:
+                process = process.lower()
+                if '%SystemRoot%\\system32' in columns[3]:
+                    process_path = '%systemroot%\\system32' + '\\' + process
+                
+                elif '\\SystemRoot\\System32' in columns[3]:
+                    process_path = '\\systemroot\\system32' + '\\' + process
+                
+                elif 'program files (x86)' in columns[3].lower():
+                    #process_path = path + '\\' + process
+                    for path in self.normal_paths_x86:
+                        if process in path:
+                            process_path = path
+                else:
+                    for path in self.normal_paths:
+                        if process in path:
+                            process_path = path
+
+                 # Extract the path using regex, considering double quotes
+                pattern = r'"?([C|c]:\\[a-zA-Z0-9%\\ \(\)\._]*\.[eE][xX][eE]|[%\\]SystemRoot[%\\][a-zA-Z0-9%\\]*\.exe)\b'            
+                paths = re.findall(pattern, columns[3])
+                # print(columns[3])
+                
+                if paths:
+                    path = paths[0].strip('"').lower()
+                    
+                    # Check if the path is exactly in the process_paths
+                    if path != process_path:
+                        self.suspect_cmdlines[pid] = row
+                else:
+                    # If no path found, consider it suspect
+                    self.suspect_cmdlines[pid] = row
+            else:
+                # If process not in the list, consider it suspect
+                self.suspect_cmdlines[pid] = row
+        # return suspect_cmdlines  
+
+
+  # Collect evidence from CmdLine
+        if pid in self.cmdline:
+            # evidence = {'cmdline': self.cmdline[pid]}
+            # self.evidence_bag[pid].append(evidence)
+
+            row =[]
+            row.append('cmdline')       
+            columns = self.cmdline[pid].split(',')
+            row.append(columns[1])
+            row.append(ppid)
+            row.append(columns[2])
+        
+            pattern = r'"?([C|c]:\\[a-zA-Z0-9%\\ \(\)\.]*\.[eE][xX][eE]|[%\\]SystemRoot[%\\][a-zA-Z0-9%\\]*\.exe)\b'            
+            paths = re.findall(pattern, columns[3])
+        
+            if paths:
+                paths = paths[0].strip('"')
+        
+            row.append(path)
+            row.append('')
+            row.append(columns[3].replace('"', ''))
+            self.evidence_bag.append(','.join(row))

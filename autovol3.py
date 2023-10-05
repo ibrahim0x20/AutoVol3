@@ -44,12 +44,16 @@ class AutoVol3(object):
     normal_proc = {}
     suspect_proc = {}
 
+    regex_patterns = []
     whitelist_paths = []
     normal_paths =[]
     normal_paths_x86 =[]        # The normal path for a process if x86
     normal_process_path = []    # The normal path for a process
     process_path = {}           # The path for the running process from dlllist
     normal_sids = {}
+
+
+
     suspecious_proc_sids = {}
     suspect_cmdlines = {}
     suspect_netscan = {}
@@ -88,6 +92,7 @@ class AutoVol3(object):
         self.initialize_normal_paths(os.path.join(self.app_path, 'normal_paths.txt'))
         self.initialize_normal_sids(os.path.join(self.app_path, 'normal_sids.txt'))
         self.initialize_whitelist_paths('whitelist.txt')
+        self.initialize_regex_patterns('regex_patterns.txt')
 
         # Read the required file from running the volatility plugins.
         self.csv_reader('pslist.csv')
@@ -287,6 +292,20 @@ class AutoVol3(object):
         with open(file_path, mode='r') as blacklist_file:
             return set(line.strip() for line in blacklist_file)
         
+    def initialize_regex_patterns(self, regex_file):
+        # Read regex patterns from the file
+        
+        with open(regex_file, 'r') as patterns_file:
+            for line in patterns_file:
+                if line.startswith('#') or not line:  
+                    continue                        # Skip this line and move to the next one
+        
+                line = line.strip()  # Remove leading/trailing whitespace
+                if line:
+                    self.regex_patterns.append(line)
+
+        #print(self.regex_patterns)
+        
     def procTree(self, proc_file):
         try:
 
@@ -371,71 +390,54 @@ class AutoVol3(object):
                 # print(self.pslist[node.children[0].pid])
                 self.suspect_proc[node.children[0].pid] =self.pslist[node.children[0].pid][2:]+ ', Has a zero root parent'
 
-        #return root_processes
-    def malcmdline(self):
+    def find_cmd_child(self, path):
 
-        no_path = ['wininit.exe', 'winlogon.exe', 'dwm.exe', 'fontdrvhost.exe', 'sihost.exe', 'ctfmon.exe', 'mctray.exe', 'taskhostw.exe', 'LogonUI.exe']
-
+        # Iterate through each row in the CSV file and find the pid of a process executed by cmd.exe
         for pid in self.cmdline:
-
-            process_path = ''
-
-            # Skip lines with 'process exited'
-            if "process exited" in self.cmdline[pid] or 'c:\\' not in self.cmdline[pid].lower():
-                continue
+            # print(pid)
+            row = self.cmdline[pid]
+            args = row[2]
+            # print(args)
             
-            row = self.cmdline[pid].strip().strip('\n')
+            # Find the match in the 'Args' column
+            if (path in args) and ('cmd.exe' not in args):
+                pid = row[0]
+                return pid  # Return the PID if a match is found
 
-            if row =='':
-                break
+        return None  # Return None if no match is found for the given path
 
-            columns = row.split(',')
-            process = columns[2]
-            # Check if the process is in the list of processes
-            #0,5064,ApplicationFra,"C:\WINDOWS\system32\ApplicationFrameHost.exe -Embedding"
+    def malcmdline(self):
+        for pid in self.cmdline:
+            # print(pid)
+            row = self.cmdline[pid]
+            args = row[2]
+            pid = row[0]
+                # Find the match in the 'Args' column
+            # match = re.search(regex_pattern, args)
 
-            if '.exe' not in process:
-                process = columns[3].split('\\')[-1].split(' ')[0].strip('"')
+            # Iterate through each regex pattern
+            for regex_pattern in self.regex_patterns:
+                match = re.search(regex_pattern, args)
+                if match:
+                    path_executed = match.group(0)
 
-            if process in no_path:
-                continue
-            
-            if process.lower() in self.normal_process_path:
-                process = process.lower()
-                if '%SystemRoot%\\system32' in columns[3]:
-                    process_path = '%systemroot%\\system32' + '\\' + process
-                
-                elif '\\SystemRoot\\System32' in columns[3]:
-                    process_path = '\\systemroot\\system32' + '\\' + process
-                
-                elif 'program files (x86)' in columns[3].lower():
-                    #process_path = path + '\\' + process
-                    for path in self.normal_paths_x86:
-                        if process in path:
-                            process_path = path
-                else:
-                    for path in self.normal_paths:
-                        if process in path:
-                            process_path = path
-
-                 # Extract the path using regex, considering double quotes
-                pattern = r'"?([C|c]:\\[a-zA-Z0-9%\\ \(\)\._]*\.[eE][xX][eE]|[%\\]SystemRoot[%\\][a-zA-Z0-9%\\]*\.exe)\b'            
-                paths = re.findall(pattern, columns[3])
-                # print(columns[3])
-                
-                if paths:
-                    path = paths[0].strip('"').lower()
-                    
-                    # Check if the path is exactly in the process_paths
-                    if path != process_path:
+                    if pid not in self.suspect_cmdlines:
                         self.suspect_cmdlines[pid] = row
-                else:
-                    # If no path found, consider it suspect
-                    self.suspect_cmdlines[pid] = row
-            else:
-                # If process not in the list, consider it suspect
-                self.suspect_cmdlines[pid] = row
-        # return suspect_cmdlines  
+                    #matched_paths.append(path_executed)
+
+                    # print(matched_paths)
+                    # When cmd.exe executed, it will create a process. search for this process and add it to the list. 
+                    # If not found in cmdline list, look for it in psscan list
+                    if 'cmd\.exe' in regex_pattern:
+                        pid = self.find_cmd_child(path_executed)
+                        if pid:
+                            if pid not in self.suspect_cmdlines:
+                            # print(f"Path executed: {path_executed}, PID: {pid}")
+                                self.suspect_cmdlines[pid] = self.cmdline[pid]
+                        else:
+                            print(f"No match found for {path_executed}")
+                    
+        #print(self.suspect_cmdlines)  
 
     def malcomm(self, blacklist_file_path):
         #print('Sixth modification')
@@ -614,9 +616,12 @@ class AutoVol3(object):
 
                     elif csv_file == 'cmdline.csv':
                         for row in csvreader:
-                            if len(row) > pid_index:
+
+                            if len(row) >= 2:
+                                if 'process exited' in row[3]:
+                                    continue
                                 pid = row[pid_index]
-                            self.cmdline[pid] = ','.join(row)
+                                self.cmdline[pid] = row[1:]
 
                     elif csv_file == 'dlllist.csv':
                         for row in csvreader:
@@ -810,20 +815,20 @@ class AutoVol3(object):
 
             row =[]
             row.append('cmdline')       
-            columns = self.cmdline[pid].split(',')
-            row.append(columns[1])
+            #columns = self.cmdline[pid].split(',')
+            row.append(self.cmdline[pid][0])          # Add pid to the list
             row.append(ppid)
-            row.append(columns[2])
+            row.append(self.cmdline[pid][1])                    # Add process name
         
             pattern = r'"?([C|c]:\\[a-zA-Z0-9%\\ \(\)\.]*\.[eE][xX][eE]|[%\\]SystemRoot[%\\][a-zA-Z0-9%\\]*\.exe)\b'            
-            paths = re.findall(pattern, columns[3])
+            paths = re.findall(pattern, self.cmdline[pid][2])
         
             if paths:
                 paths = paths[0].strip('"')
         
             row.append(path)
             row.append('')
-            row.append(columns[3].replace('"', ''))
+            row.append(self.cmdline[pid][2].replace('"', ''))
             self.evidence_bag.append(','.join(row))
 
 
@@ -909,7 +914,7 @@ class AutoVol3(object):
             mparser.write('\n'.join(self.evidence_bag))
 
     def malicious_weight(self):
-        print(self.suspect_proc['2222'])
+
         if self.pslist:
             for pid in self.pslist:
                 weight = 0
