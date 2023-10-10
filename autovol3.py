@@ -368,12 +368,12 @@ class AutoVol3(object):
 
     def malproc(self,node):
 
-        # 1. Should find abnormal parent-child relationship
-        # 2. Should find zero parent processes
-        # 3. Should find processes running from weired paths
-        # 4. Should hidden/Unlinked processes like processes found in psscan, but not in pslist
-        # 5. When does the process start?
-        # 6. Should find any process that impersonate known processes and trying to blind in with normal processes
+        # 1. Should find abnormal parent-child relationship                                                             ==> Done
+        # 2. Should find zero parent processes                                                                          ==> Done
+        # 3. Should find processes running from weired paths                                                            ==> Done
+        # 4. Should hidden/Unlinked processes like processes found in psscan, but not in pslist                         ==> Done
+        # 5. When does the process start?                                                                          ==>TBD
+        # 6. Should find any process that impersonate known processes and trying to blind in with normal processes      ==> Done
 
 
         # 1. Should find abnormal parent-child relationship
@@ -401,6 +401,8 @@ class AutoVol3(object):
                     continue
                 # print(self.pslist[node.children[0].pid])
                 self.suspect_proc[node.children[0].pid] =self.pslist[node.children[0].pid][2:]+ ', Has a zero root parent'
+
+    # 3. Should find processes running from weired paths
 
     def malpath(self):
         for pid in self.pslist:
@@ -450,6 +452,8 @@ class AutoVol3(object):
                     # print(matched_paths)
                     # When cmd.exe executed, it will create a process. search for this process and add it to the list. 
                     # If not found in cmdline list, look for it in psscan list
+                    # You should also create the same for powershell.exe, wscript.exe, wmiprvse.exe, rundll32.exe, dllhost.exe, ...
+
                     if 'cmd\.exe' in regex_pattern:
                         pid = self.find_cmd_child(path_executed)
                         if pid:
@@ -461,9 +465,10 @@ class AutoVol3(object):
                     
 
     def malcomm(self, blacklist_file_path):
-        #print('Sixth modification')
+
+        # Add option for VPN concentrator
+
         blacklist_addresses = self.initialize_blacklist_addresses(blacklist_file_path)
-        # Open the CSV file and parse the data
 
         # Define the browser processes you want to exclude
         browsers = ["chrome.exe", "firefox.exe", "iexplore.exe", "edge.exe"]  # Add more if needed
@@ -484,28 +489,39 @@ class AutoVol3(object):
 
                     else:
                         tmp_addr = row[2].split(':')
-                        local_addr = tmp_addr[0]
+                        src_ip = tmp_addr[0]
                         local_port = tmp_addr[1]
 
                         tmp_addr = row[3].split(':')
-                        foreign_addr = tmp_addr[0]
+                        dst_ip = tmp_addr[0]
                         foreign_port = tmp_addr[1]
 
                         owner = row[6].lower()  # Convert owner to lowercase for case-insensitive comparison
-                            
+
+                         # 1. Any process communicating over port 80, 443, or 8080 that is not a browser
                         if foreign_port in ["80", "443", "8080"] and not any(browser in owner for browser in browsers):
-                           suspect_comm.append(','.join(row))
+                           suspect_comm.append(','.join(row) + ' A process that is not browser using port: '+foreign_port)
+                        
+                        # 2. Any browser process not communicating over port 80, 443, or 8080
                         elif any(browser in owner for browser in browsers) and foreign_port not in ["80", "443", "8080"]:
+                           suspect_comm.append(','.join(row)+ ' A browser communicating over unusual port: '+ foreign_port)
+
+                        # 3. RDP connections (port 3389), particularly if originating from odd IP addresses. External RDP
+                        # connections are typically routed through a VPN concentrator. If the src_ip is not from a VPN concentrator, this is malicious
+                        elif foreign_port == "3389" and not src_ip.startswith(("*", "::", "0.0.0.0", "127.0.0.1", "172.16.", "192.168.")):
+                           suspect_comm.append(','.join(row)+' External IP communicating directly with RDP port')
+
+                        # 4. Connections to unexplained internal or external IP addresses. 
+                        # External resources like IP reputation services can also provide additional context.
+                        elif dst_ip in blacklist_addresses:
                            suspect_comm.append(','.join(row))
-                        elif foreign_port == "3389" and not foreign_addr.startswith(("*", "::", "0.0.0.0", "127.0.0.1", "172.16.", "192.168.")):
-                           suspect_comm.append(','.join(row))
-                        elif foreign_addr in blacklist_addresses:
-                           suspect_comm.append(','.join(row))
-                        elif (foreign_port == "3389") and \
-                        ((local_addr.startswith("172.16.") and foreign_addr.startswith("172.16.")) or \
-                                (local_addr.startswith("192.168.") and foreign_addr.startswith("192.168."))):
-                           suspect_comm.append(','.join(row))
-                        elif foreign_port in ["5985", "5986"] and not foreign_addr.startswith(("0.0.0.0", "127.0.0.1")):
+
+                        # 7. Workstation to workstation connections. Workstations don’t typically RDP, map shares, or authenticate to other workstations. 
+                        # The expected model is workstations communicate with servers. Workstation to workstation connections often uncover lateral movement. 
+                        elif ((src_ip.startswith("172.16.") and dst_ip.startswith("172.16.")) or \
+                                (src_ip.startswith("192.168.") and dst_ip.startswith("192.168."))):
+                           suspect_comm.append(','.join(row)+' Workstation to workstation communication')
+                        elif foreign_port in ["5985", "5986"] and not dst_ip.startswith(("0.0.0.0", "127.0.0.1")):
                            suspect_comm.append(','.join(row))
             
             else:
@@ -516,29 +532,40 @@ class AutoVol3(object):
 
                 else:
                     tmp_addr = row[2].split(':')
-                    local_addr = tmp_addr[0]
+                    src_ip = tmp_addr[0]
                     local_port = tmp_addr[1]
 
                     tmp_addr = row[3].split(':')
-                    foreign_addr = tmp_addr[0]
+                    dst_ip = tmp_addr[0]
                     foreign_port = tmp_addr[1]
 
                     owner = row[6].lower()  # Convert owner to lowercase for case-insensitive comparison
                        
+                     # 1. Any process communicating over port 80, 443, or 8080 that is not a browser
                     if foreign_port in ["80", "443", "8080"] and not any(browser in owner for browser in browsers):
-                       suspect_comm.append(','.join(row))
+                        suspect_comm.append(','.join(row)+ ' A process that is not browser using port: '+foreign_port)
+                    
+                    # 2. Any browser process not communicating over port 80, 443, or 8080
                     elif any(browser in owner for browser in browsers) and foreign_port not in ["80", "443", "8080"]:
-                       suspect_comm.append(','.join(row))
-                    elif foreign_port == "3389" and not foreign_addr.startswith(("*", "::", "0.0.0.0", "127.0.0.1", "172.16.", "192.168.")):
-                       suspect_comm.append(','.join(row))
-                    elif foreign_addr in blacklist_addresses:
-                       suspect_comm.append(','.join(row))
-                    if (foreign_port == "3389") and \
-                    ((local_addr.startswith("172.16.") and foreign_addr.startswith("172.16.")) or \
-                            (local_addr.startswith("192.168.") and foreign_addr.startswith("192.168."))):
-                       suspect_comm.append(','.join(row))
-                    if foreign_port in ["5985", "5986"] and not foreign_addr.startswith(("0.0.0.0", "127.0.0.1")):
-                       suspect_comm.append(','.join(row))
+                        suspect_comm.append(','.join(row)+ ' A browser communicating over unusual port: '+ foreign_port)
+
+                    # 3. RDP connections (port 3389), particularly if originating from odd IP addresses. External RDP
+                    # connections are typically routed through a VPN concentrator. If the src_ip is not from a VPN concentrator, this is malicious
+                    elif foreign_port == "3389" and not src_ip.startswith(("*", "::", "0.0.0.0", "127.0.0.1", "172.16.", "192.168.")):
+                        suspect_comm.append(','.join(row)+' External IP communicating directly with RDP port')
+
+                    # 4. Connections to unexplained internal or external IP addresses. 
+                    # External resources like IP reputation services can also provide additional context.
+                    elif dst_ip in blacklist_addresses:
+                        suspect_comm.append(','.join(row))
+
+                    # 7. Workstation to workstation connections. Workstations don’t typically RDP, map shares, or authenticate to other workstations. 
+                    # The expected model is workstations communicate with servers. Workstation to workstation connections often uncover lateral movement. 
+                    elif ((src_ip.startswith("172.16.") and dst_ip.startswith("172.16.")) or \
+                            (src_ip.startswith("192.168.") and dst_ip.startswith("192.168."))):
+                        suspect_comm.append(','.join(row)+' Workstation to workstation communication')
+                    elif foreign_port in ["5985", "5986"] and not dst_ip.startswith(("0.0.0.0", "127.0.0.1")):
+                        suspect_comm.append(','.join(row))
 
             if suspect_comm:
                 if pid not in self.suspect_netscan:
@@ -1219,19 +1246,22 @@ if __name__ == "__main__":
     
     # Parse Arguments
     parser = argparse.ArgumentParser(description='AutVol3 - Simple Memoray Image Analyzer')
-    parser.add_argument('-p', help='Path to memory image', metavar='path', default='')
+    parser.add_argument('-p', help='Path to memory image and csv files like pslist, netscan ...', metavar='path', default='')
     parser.add_argument('--version', action='store_true', help='Shows welcome text and version of AutoVol3, then exit', default=False)
 
     # Add option for baseline
     # Add option for image profile if using vol2
     # Add option for blacklist IPs
     # Add option for chosing memory image file
+    # Add option to add VPN concentrator
 
     args = parser.parse_args()
 
     if not args.p:
         print('Must specify memory image path!')
+        parser.print_help()
         sys.exit(1)
+ 
 
     autovol3 = AutoVol3(args)
 

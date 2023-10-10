@@ -62,7 +62,7 @@ netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63826 --> 172.16.4.5:3389 CLOSED,2018-
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63834 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:36:10 UTC+0000,I Will add info later
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63828 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:35:31 UTC+0000,I Will add info later
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63958 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:46:44 UTC+0000,I Will add info later
-netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63848 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:38:32 UTC+0000,I Will add info later
+netscan,8260,5948,p.exe,TCPv4 80.16.6.11:63848 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:38:32 UTC+0000,I Will add info later
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63823 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:34:17 UTC+0000,I Will add info later
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63841 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:37:38 UTC+0000,I Will add info later
 netscan,8260,5948,p.exe,TCPv4 172.16.6.11:63835 --> 172.16.4.5:3389 CLOSED,2018-09-05 11:36:47 UTC+0000,I Will add info later
@@ -70,4 +70,53 @@ getsids,8260,5948,p.exe,S-1-5-21-3445421715-2530590580-3149308974-1193,,spsql
 getsids,8260,5948,p.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
 getsids,8260,5948,p.exe,S-1-5-2,,Network
 getsids,8260,5948,p.exe,S-1-5-21-3445421715-2530590580-3149308974-512,,Domain Admins
+pslist,1096,740,subject_srv.ex,C:\windows\subject_srv.exe,2018-09-06 18:28:30.000000 , Suspecious parent-child relationship
+cmdline,1096,740,subject_srv.ex,C:\windows\subject_srv.exe,,C:\windows\subject_srv.exe -s base-hunt.shieldbase.lan:5682 -l 3262 -v F-Response Subject -k 155522845
+netscan,1096,740,subject_srv.ex,TCPv4 0.0.0.0:3262 --> 0.0.0.0:0 LISTENING,2018-09-06 18:28:32 UTC+0000,I Will add info later
+netscan,1096,740,subject_srv.ex,TCPv6 :::3262 --> :::0 LISTENING,2018-09-06 18:28:32 UTC+0000,I Will add info later
+netscan,1096,740,subject_srv.ex,TCPv4 172.16.6.11:3262 --> 172.16.5.50:39372 ESTABLISHED,2018-09-06 18:51:51 UTC+0000,I Will add info later
+getsids,1096,740,subject_srv.ex,S-1-5-18,,Malicious Process: Uknown process running with system account: Local System
+getsids,1096,740,subject_srv.ex,S-1-5-32-544,,Malicious Process: Uknown process running with system account: The process spawned from a user context with high privileges account: Administrators
+getsids,1096,740,subject_srv.ex,S-1-16-16384,,Malicious Process: Uknown process running with system account: System Mandatory Level
+pslist,740,632,services.exe,C:\WINDOWS\system32\services.exe,2018-08-30 13:52:20.000000 
+cmdline,740,632,services.exe,C:\WINDOWS\system32\services.exe,,C:\WINDOWS\system32\services.exe
+netscan,740,632,services.exe,TCPv4 0.0.0.0:49719 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:52 UTC+0000,I Will add info later
+netscan,740,632,services.exe,TCPv6 :::49719 --> :::0 LISTENING,2018-08-30 13:52:52 UTC+0000,I Will add info later
+netscan,740,632,services.exe,TCPv4 0.0.0.0:49719 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:52 UTC+0000,I Will add info later
+getsids,740,632,services.exe,S-1-5-18,,Local System
+getsids,740,632,services.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
+getsids,740,632,services.exe,S-1-16-16384,,System Mandatory Level
+pslist,632,540,wininit.exe,C:\WINDOWS\system32\wininit.exe,2018-08-30 13:52:20.000000 ,Disabled
+cmdline,632,540,wininit.exe,C:\WINDOWS\system32\wininit.exe,,wininit.exe
+netscan,632,540,wininit.exe,TCPv4 0.0.0.0:49664 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:21 UTC+0000,I Will add info later
+netscan,632,540,wininit.exe,TCPv4 0.0.0.0:49664 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:21 UTC+0000,I Will add info later
+netscan,632,540,wininit.exe,TCPv6 :::49664 --> :::0 LISTENING,2018-08-30 13:52:21 UTC+0000,I Will add info later
+getsids,632,540,wininit.exe,S-1-5-18,,Local System
+getsids,632,540,wininit.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
+getsids,632,540,wininit.exe,S-1-16-16384,,System Mandatory Level
+pslist,540,388,smss.exe,,2018-08-30 13:52:20.000000 
+getsids,540,388,smss.exe,S-1-5-18,,Local System
+getsids,540,388,smss.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
+getsids,540,388,smss.exe,S-1-16-16384,,System Mandatory Level
+pslist,388,4,smss.exe,\SystemRoot\System32\smss.exe,2018-08-30 13:51:58.000000 ,Disabled
+cmdline,388,4,smss.exe,\SystemRoot\System32\smss.exe,,\SystemRoot\System32\smss.exe
+getsids,388,4,smss.exe,S-1-5-18,,Local System
+getsids,388,4,smss.exe,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
+getsids,388,4,smss.exe,S-1-16-16384,,System Mandatory Level
+pslist,4,0,System,,2018-08-30 13:51:58.000000 
+netscan,4,0,System,TCPv4 172.16.6.11:59352 --> 172.16.7.15:445 ESTABLISHED,2018-08-31 01:31:24 UTC+0000,I Will add info later
+netscan,4,0,System,UDPv4 172.16.6.11:137 --> *:* ,2018-08-30 13:52:22 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv4 172.16.6.11:139 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:22 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv4 0.0.0.0:445 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:23 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv6 :::445 --> :::0 LISTENING,2018-08-30 13:52:23 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv4 172.16.6.11:49763 --> 172.16.4.5:445 ESTABLISHED,2018-08-30 13:53:41 UTC+0000,I Will add info later
+netscan,4,0,System,UDPv4 172.16.6.11:138 --> *:* ,2018-08-30 13:52:22 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv4 0.0.0.0:47001 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:24 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv6 :::47001 --> :::0 LISTENING,2018-08-30 13:52:24 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv4 0.0.0.0:5985 --> 0.0.0.0:0 LISTENING,2018-08-30 13:52:24 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv6 :::5985 --> :::0 LISTENING,2018-08-30 13:52:24 UTC+0000,I Will add info later
+netscan,4,0,System,TCPv4 172.16.6.11:445 --> 172.16.6.14:65368 ESTABLISHED,2018-09-05 11:28:54 UTC+0000,I Will add info later
+getsids,4,0,System,S-1-5-18,,Local System
+getsids,4,0,System,S-1-5-32-544,,The process spawned from a user context with high privileges account: Administrators
+getsids,4,0,System,S-1-16-16384,,System Mandatory Level
 pslist,2222,1111,pexe.exe,,2018-08-30 22:15:18.000000 , Has a zero root parent
