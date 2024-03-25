@@ -1,0 +1,19 @@
+(?<=cmd\.exe /C )(?:.+?\.exe)
+(?<=cmd\.exe /C )(.+?\.ps1)
+(?<=regsvr32\.exe /s )([A-Za-z]:\\[\\A-Za-z0-9._\-]+\.(dll|exe))
+(.+?\\powershell\.exe)
+mshta\.exe
+wscript\.exe
+utilman\.exe 
+wmic\.exe
+(?<=rundll32\.[eE][xX][eE] )(.+?\.dll,.+?$)
+
+(.+?\\wmiprvse.exe)
+#
+(.+?\\certutil\.exe)
+powershell\.exe -encodedCommand [A-Za-z0-9+/]+=*
+#
+#regsvr32.exe /s /u /I:file.blah scrub.dll
+regsvr32\.exe\s+[a-zA-Z/\s]+:[^\s]+\.[^\s]+\s+[^\s]+\.dll$
+
+rundll32\.exe

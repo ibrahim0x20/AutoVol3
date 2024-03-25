@@ -1,0 +1,148 @@
+$ vol2.py  -f memory/base-rd01-memory.img kdbgscan
+Volatility Foundation Volatility Framework 2.6.1
+**************************************************
+Instantiating KDBG using: Unnamed AS Win10x64_17763 (6.4.17763 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win10x64_17763
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
+
+**************************************************
+Instantiating KDBG using: Unnamed AS Win10x64_17134 (6.4.17134 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win10x64_17134
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
+
+**************************************************
+Instantiating KDBG using: Unnamed AS Win10x64_14393 (6.4.14393 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win10x64_14393
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
+
+**************************************************
+Instantiating KDBG using: Unnamed AS Win10x64_16299 (6.4.16299 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win10x64_16299
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
+
+**************************************************
+Instantiating KDBG using: Unnamed AS Win2016x64_14393 (6.4.14393 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win2016x64_14393
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
+
+**************************************************
+Instantiating KDBG using: Unnamed AS Win10x64_10586 (6.4.10586 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win10x64_10586
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
+
+**************************************************
+Instantiating KDBG using: Unnamed AS Win10x64_15063 (6.4.15063 64bit)
+Offset (V)                    : 0xf8012536c910
+Offset (P)                    : 0x2d6c910
+KdCopyDataBlock (V)           : 0xf801252197a4
+Block encoded                 : Yes
+Wait never                    : 0x2b037a0024ad614a
+Wait always                   : 0x495ae44c6070800
+KDBG owner tag check          : True
+Profile suggestion (KDBGHeader): Win10x64_15063
+Version64                     : 0xf8012536f710 (Major: 15, Minor: 16299)
+Service Pack (CmNtCSDVersion) : 0
+Build string (NtBuildLab)     : 16299.431.amd64fre.rs3_release_s
+PsActiveProcessHead           : 0xfffff8012537bc20 (128 processes)
+PsLoadedModuleList            : 0xfffff80125383130 (175 modules)
+KernelBase                    : 0xfffff80125017000 (Matches MZ: True)
+Major (OptionalHeader)        : 10
+Minor (OptionalHeader)        : 0
+KPCR                          : 0xfffff8012396e000 (CPU 0)
+KPCR                          : 0xffffe0816b440000 (CPU 1)
